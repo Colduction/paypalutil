@@ -1,9 +1,6 @@
 package paypalutil
 
-import (
-	"strings"
-	"unsafe"
-)
+import "strings"
 
 type (
 	PaymentToken       string
@@ -26,21 +23,42 @@ func (s PaymentToken) String() string {
 	if s == "" {
 		return ""
 	}
-	return *(*string)(unsafe.Pointer(&s))
+	return string(s)
+}
+
+func (s PaymentToken) Bytes() []byte {
+	if s == "" {
+		return nil
+	}
+	return []byte(s)
 }
 
 func (s PaymentTokenName) String() string {
 	if s == "" {
 		return ""
 	}
-	return *(*string)(unsafe.Pointer(&s))
+	return string(s)
+}
+
+func (s PaymentTokenName) Bytes() []byte {
+	if s == "" {
+		return nil
+	}
+	return []byte(s)
 }
 
 func (s PaymentTokenPrefix) String() string {
 	if s == "" {
 		return ""
 	}
-	return *(*string)(unsafe.Pointer(&s))
+	return string(s)
+}
+
+func (s PaymentTokenPrefix) Bytes() []byte {
+	if s == "" {
+		return nil
+	}
+	return []byte(s)
 }
 
 func (s PaymentToken) IsValid() bool {
