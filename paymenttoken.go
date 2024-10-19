@@ -86,16 +86,33 @@ var lookupPTPrefix = map[string]paymentTokenDetails{
 	orderID.Prefix:          orderID,
 }
 
+type PaymentToken string
+
+func (p PaymentToken) IsValidFormat() error {
+	return isValidFormat(string(p))
+}
+
+func (p PaymentToken) String() string {
+	return string(p)
+}
+
+func (p PaymentToken) Bytes() []byte {
+	return []byte(p)
+}
+
+func (p PaymentToken) IsZero() bool {
+	return p == ""
+}
+
 type paymentToken struct {
 	Details paymentTokenDetails `json:"details,omitempty"`
-	Token   string              `json:"token,omitempty"`
+	Token   PaymentToken        `json:"token,omitempty"`
 }
 
 type PaymentTokenProvider interface {
 	GetDetails() PaymentTokenDetailsProvider
 	GetToken() string
 	GetTokenBytes() []byte
-	IsValidFormat() error
 	IsZero() bool
 }
 
@@ -120,16 +137,16 @@ func newPaymentToken(token string) (paymentToken, error) {
 		if !isUpperNumber(after) {
 			return paymentToken{}, PaymentTokenInvalidSuffixError(token)
 		}
-		return paymentToken{Details: pttype, Token: token}, nil
+		return paymentToken{Details: pttype, Token: PaymentToken(token)}, nil
 	}
 	if !isUpperNumber(before) {
 		return paymentToken{}, PaymentTokenInvalidFormatError(token)
 	}
-	return paymentToken{Details: orderID, Token: token}, nil
+	return paymentToken{Details: orderID, Token: PaymentToken(token)}, nil
 }
 
 func (m paymentToken) GetToken() string {
-	return m.Token
+	return string(m.Token)
 }
 
 func (m paymentToken) GetTokenBytes() []byte {
@@ -138,10 +155,6 @@ func (m paymentToken) GetTokenBytes() []byte {
 
 func (m paymentToken) GetDetails() PaymentTokenDetailsProvider {
 	return m.Details
-}
-
-func (m paymentToken) IsValidFormat() error {
-	return isValidFormat(m.Token)
 }
 
 func (m paymentToken) IsZero() bool {
